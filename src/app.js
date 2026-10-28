@@ -2,11 +2,11 @@ const express = require('express')
 
 const app = express()
 
-app.use("/user/:userId", (req,res)=>{
+// app.use("/user/:userId", (req,res)=>{
 
-    console.log(req.params)
-    res.send('got my information')
-})
+//     console.log(req.params)
+//     res.send('yes my information')
+// })
 
 // app.get("/user",(req,res)=>{
 //     res.send('get user successfully')
@@ -28,8 +28,28 @@ app.use("/user/:userId", (req,res)=>{
 // })
 
 
-app.use( "/test", (req,res)=>{
-    res.send('this is test')
+// app.use( "/test", (req,res)=>{
+//     res.send('this is test')
+// })
+
+//multiple route handlers
+app.use("/user",(req,res,next)=>{
+    console.log('1st response')
+   // res.send('1st response')
+   next();
+},
+(req,res,next)=>{
+    console.log('2nd response')
+    res.send('2nd response')
+    next()
+},
+(req,res,next)=>{
+    console.log('3rd response')
+    res.send('3rd response')
+},
+(req,res,next)=>{
+    console.log('4th response')
+    res.send('4th response')
 })
 
 
