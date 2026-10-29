@@ -1,4 +1,5 @@
 const express = require('express')
+const {AuthAdmin}=require('./middlewares/auth')
 
 const app = express()
 
@@ -33,24 +34,35 @@ const app = express()
 // })
 
 //multiple route handlers
-app.use("/user",(req,res,next)=>{
-    console.log('1st response')
-   // res.send('1st response')
-   next();
-},
-(req,res,next)=>{
-    console.log('2nd response')
-    res.send('2nd response')
-    next()
-},
-(req,res,next)=>{
-    console.log('3rd response')
-    res.send('3rd response')
-},
-(req,res,next)=>{
-    console.log('4th response')
-    res.send('4th response')
+// app.use("/user",(req,res,next)=>{
+//     console.log('1st response')
+//    // res.send('1st response')
+//    next();
+// },
+// (req,res,next)=>{
+//     console.log('2nd response')
+//     res.send('2nd response')
+//     next()
+// },
+// (req,res,next)=>{
+//     console.log('3rd response')
+//     res.send('3rd response')
+// },
+// (req,res,next)=>{
+//     console.log('4th response')
+//     res.send('4th response')
+// })
+
+app.use("/admin",AuthAdmin)
+
+app.get("/admin/GetData",(req,res)=>{
+    res.send('authorized admin')
 })
+
+app.get("/admin/DeleteData",(req,res)=>{
+    res.send('Data Deleted')
+})
+
 
 
 app.listen(7777, ()=>{
