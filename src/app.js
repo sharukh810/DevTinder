@@ -1,10 +1,38 @@
 const express = require('express')
-const {AuthAdmin}=require('./middlewares/auth')
-
+const connectDb= require('./config/database')
 const app = express()
+const User  = require('./models/user')
+
+app.post("/signup",(req,res)=>{
+    const user = new User({
+        firstName: "sharukh",
+        lastName: "nawab",
+        emailId: "sharukh@nawab.com",
+        password: "sharukh@123"
+    })
+
+    user.save()
+    res.send("db created successfully")
+})
+
+
+
+connectDb().then(
+    ()=>{
+        console.log('db connected successfully')
+        app.listen(7777, ()=>{
+            console.log('server is succcessfully run on 7777...')
+        })
+    }
+).catch((err)=>{
+    console.error("not connected")
+})
+
+
+
 
 // app.use("/user/:userId", (req,res)=>{
-
+    
 //     console.log(req.params)
 //     res.send('yes my information')
 // })
@@ -53,18 +81,14 @@ const app = express()
 //     res.send('4th response')
 // })
 
-app.use("/admin",AuthAdmin)
+// app.use("/admin",AuthAdmin)
 
-app.get("/admin/GetData",(req,res)=>{
-    res.send('authorized admin')
-})
+// app.get("/admin/GetData",(req,res)=>{
+//     res.send('authorized admin')
+// })
 
-app.get("/admin/DeleteData",(req,res)=>{
-    res.send('Data Deleted')
-})
+// app.get("/admin/DeleteData",(req,res)=>{
+//     res.send('Data Deleted')
+// })
 
 
-
-app.listen(7777, ()=>{
-    console.log('server is succcessfully run on 7777...')
-})
