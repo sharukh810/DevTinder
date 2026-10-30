@@ -2,17 +2,51 @@ const express = require('express')
 const connectDb= require('./config/database')
 const app = express()
 const User  = require('./models/user')
+const user = require('./models/user')
 
-app.post("/signup",(req,res)=>{
-    const user = new User({
-        firstName: "sharukh",
-        lastName: "nawab",
-        emailId: "sharukh@nawab.com",
-        password: "sharukh@123"
-    })
+app.use(express.json())
 
-    user.save()
-    res.send("db created successfully")
+
+app.post("/signup",async(req,res)=>{
+    const user = new User(req.body)
+    try{
+        await user.save()
+        res.send("db created successfully")
+
+    }
+    catch(err){
+        console.error('not sync')
+    }
+})    
+
+app.get("/feed",async(req,res)=>{
+    const users = await User.find({})
+    res.send(users)
+})
+
+app.get("/user",async(req,res)=>{
+    const userEmail = req.body.emailId
+
+    const user = await User.find({emailId: userEmail})
+
+    res.send(user)
+})
+
+
+app.delete("/user",async(req,res)=>{
+    const userId = req.body.userId
+
+    const user = await User.findByIdAndDelete({_id: userId})
+
+    res.send('user deleted successfully')
+})
+
+app.patch("/user",async(req,res)=>{
+    const data = req.body
+    const userId = req.body.userId
+
+    const user = await User.findByIdAndUpdate({_id: userId}, data)
+    res.send('user updated successfully')
 })
 
 
