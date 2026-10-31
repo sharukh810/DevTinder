@@ -41,11 +41,23 @@ app.delete("/user",async(req,res)=>{
     res.send('user deleted successfully')
 })
 
-app.patch("/user",async(req,res)=>{
+app.patch("/user/:userId",async(req,res)=>{
     const data = req.body
-    const userId = req.body.userId
+    const userId = req.params?.userId
 
-    const user = await User.findByIdAndUpdate({_id: userId}, data)
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+
+    const IsAllowedUpdates = Object.keys(data).every((k)=> ALLOWED_UPDATES.includes(k))
+
+    if(!IsAllowedUpdates){
+        throw new Error("updates not allowed")
+    }
+
+    if(data?.skills.length>10){
+        throw new Error("updates not allowed")
+    }
+
+    const user = await User.findByIdAndUpdate({_id: userId}, data,{runValidators: true})
     res.send('user updated successfully')
 })
 
@@ -65,64 +77,14 @@ connectDb().then(
 
 
 
-// app.use("/user/:userId", (req,res)=>{
-    
-//     console.log(req.params)
-//     res.send('yes my information')
-// })
-
-// app.get("/user",(req,res)=>{
-//     res.send('get user successfully')
-// })
 
 
-// app.post("/user",(req,res)=>{
-//     res.send('post user successfully')
-// })
 
 
-// app.delete("/user",(req,res)=>{
-//     res.send('delete user successfully')
-// })
 
 
-// app.patch("/user",(req,res)=>{
-//     res.send('update user successfully')
-// })
 
 
-// app.use( "/test", (req,res)=>{
-//     res.send('this is test')
-// })
 
-//multiple route handlers
-// app.use("/user",(req,res,next)=>{
-//     console.log('1st response')
-//    // res.send('1st response')
-//    next();
-// },
-// (req,res,next)=>{
-//     console.log('2nd response')
-//     res.send('2nd response')
-//     next()
-// },
-// (req,res,next)=>{
-//     console.log('3rd response')
-//     res.send('3rd response')
-// },
-// (req,res,next)=>{
-//     console.log('4th response')
-//     res.send('4th response')
-// })
-
-// app.use("/admin",AuthAdmin)
-
-// app.get("/admin/GetData",(req,res)=>{
-//     res.send('authorized admin')
-// })
-
-// app.get("/admin/DeleteData",(req,res)=>{
-//     res.send('Data Deleted')
-// })
 
 
