@@ -6,9 +6,14 @@ const User = require('./models/user')
 const validateSignupData = require('./utils/validate')
 const bcrypt = require('bcrypt')
 const validator =require('validator')
-
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
+const { userAuth } = require('./middlewares/auth')
 
 app.use(express.json())
+app.use(cookieParser())
+
+
 
 // SIGNUP API
 app.post("/signup", async (req, res) => {
@@ -49,11 +54,16 @@ app.post('/login',async (req,res)=>{
         if(!user){
             throw new Error('invalid emailId')
         }
-        console.log(user)
+       
 
         const PasswordValid = await bcrypt.compare(password , user.password)
 
         if(PasswordValid){
+            //JWT COOKIE CREATE
+            const token = await jwt.sign({_id: user._id}, "Sharukh@786")
+
+            //SEND COOKIE TO USER
+            res.cookie("token", token )
             res.send('login successfull!!!')
         }
         else{
@@ -65,6 +75,20 @@ app.post('/login',async (req,res)=>{
     catch (err) {
         console.error(err)
         res.status(500).send("Something went wrong : " + err.message)
+    }
+})
+
+//PROFILE API
+app.get("/profile",userAuth, async(req,res)=>{
+    try{
+
+        const user = req.user
+        
+        res.send(user)
+    }
+     catch (err) {
+        console.error(err)
+        res.status(500).send("Something went wrong"+ err.message)
     }
 })
 
