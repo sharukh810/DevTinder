@@ -61,3 +61,4 @@ profileRouter.patch("/forgotPassword", userAuth, async (req, res) => {
 })
 
 module.exports = profileRouter
+
