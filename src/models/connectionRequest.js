@@ -3,10 +3,12 @@ const mongoose = require("mongoose")
 const sendConnectionRequest = new mongoose.Schema({
     fromUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     },
     toUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     },
     status: {
@@ -18,6 +20,8 @@ const sendConnectionRequest = new mongoose.Schema({
     }
 },{timestamps: true})
 
+sendConnectionRequest.index({fromUserId: 1, toUserId: 1})
 
 
-module.exports =  mongoose.model("ConnectionRequest", sendConnectionRequest)
+
+module.exports =  mongoose.model("ConnectionRequest", sendConnectionRequest) 

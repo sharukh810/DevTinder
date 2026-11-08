@@ -55,13 +55,57 @@ requestRouter.post("/request/send/:status/:toUserId",
 
         const user  = await connection.save()
 
-        res.json({message: "request saved" , user})
+        res.json({message: req.user.firstName + " is " + status + " the profile of " + existUser.firstName
+             , user})
     }
     catch (err) {
         console.error(err)
         res.status(404).send("Something went wrong:  "+ err.message)
     }
     })
-  
+
+    requestRouter.post("/request/review/:status/:requestId", userAuth , async(req,res)=>{
+
+
+        //loggedIn user is sending the api or not 
+        //it is in interested state
+        //verify status of user....accepted,rejected
+        try{
+
+            const loginUser = req.user
+            
+        const {status, requestId} = req.params
+        
+        const loginStatusValid = ["accepted", "rejected"]
+
+        if(!loginStatusValid.includes(status)){
+            
+            throw new Error("status not valid")
+        }
+
+        const connectionCheck = await ConnectionRequest.findOne({
+            _id: requestId,
+            toUserId: loginUser._id,
+            status: "interested" ,
+        })
+
+        if(!connectionCheck){
+            throw new Error("user not found")
+        }
+
+        connectionCheck.status = status
+
+        const data = await connectionCheck.save()
+
+        res.json({message: "you accepted the request" , data})
+        
+    }
+
+    catch (err) {
+        console.error(err)
+        res.status(404).send("Something went wrong:  "+ err.message)
+    }
+
+    })
     
 module.exports = requestRouter
