@@ -8,7 +8,7 @@ const userAuth  = async(req,res,next)=>{
             const cookie = req.cookies
             const {token} = cookie
             if(!token){
-                throw new Error('invalia token')
+                res.status(401).send("Please Login")
             }
             
             // VERIFY JWT TOKEN

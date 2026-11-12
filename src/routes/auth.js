@@ -1,6 +1,6 @@
 const express = require("express")
 const authRouter = express.Router()
-const validateSignupData = require('../utils/validate')
+const {validateSignupData} = require('../utils/validate')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const validator =require('validator')
@@ -23,17 +23,20 @@ authRouter.post("/signup", async (req, res) => {
             firstName,
             lastName,
             emailId,
-            password: hashPassword
+            password: hashPassword,
         })
 
-        await user.save()
+        const savedUser = await user.save();
+    const token = await savedUser.getJWT();
 
-        res.send("User created successfully") 
-    }
-    catch (err) {
-        console.error(err)
-        res.status(500).send("Something went wrong")
-    }
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+
+    res.json({ message: "User Added successfully!", data: savedUser });
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
 })
 
 
@@ -50,7 +53,7 @@ authRouter.post('/login',async (req,res)=>{
             throw new Error('invalid emailId')
         }
        
-
+ 
         const isPasswordValid = await user.validatePassword(password)
 
         if(isPasswordValid){
@@ -59,7 +62,7 @@ authRouter.post('/login',async (req,res)=>{
 
             //SEND COOKIE TO USER
             res.cookie("token", token )
-            res.send('login successfull!!!')
+            res.send(user)
         }
         else{
             throw new Error('invalid credentials')

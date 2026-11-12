@@ -16,11 +16,22 @@ const validateSignupData = (req)=>{
 
 
 const validateEditdata = (req)=>{
-     const allowedEdits = ["firstName","lastName","age","gender", "skills", "about"]
+     const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "photoUrl",
+    "gender",
+    "age",
+    "about",
+    "skills",
+  ];
 
-     const isAllowedEdit = Object.keys(req.body).every((field)=>{allowedEdits.includes(field)})
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field)
+  );
 
-     return isAllowedEdit
+  return isEditAllowed;
 
 
 }

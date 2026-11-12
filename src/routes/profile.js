@@ -2,7 +2,7 @@ const express  = require("express")
 const profileRouter = express.Router()
 const { userAuth } = require('../middlewares/auth')
 const user = require("../models/user")
-const {} = require("../utils/validate")
+const {validateEditdata} = require("../utils/validate")
 
 
 //PROFILE VIEW API
