@@ -3,66 +3,67 @@ const requestRouter = express.Router()
 const { userAuth } = require('../middlewares/auth')
 const ConnectionRequest = require("../models/connectionRequest")
 const User = require("../models/user")
-
-requestRouter.post("/request/send/:status/:toUserId",
-    userAuth,
-    async(req,res)=>{
-        try{
-
-            const fromUserId = req.user._id
-            const toUserId = req.params.toUserId
-            const status = req.params.status
+const sendEmail = require("../utils/sendEmail")
 
 
-            //allow status
-            const allowedStatus = ["interested", "ignored"]
-            if(!allowedStatus.includes(status)){
-            throw new Error('invalid status')
-        }
+requestRouter.post(
+  "/request/send/:status/:toUserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.toUserId;
+      const status = req.params.status;
 
+      const allowedStatus = ["ignored", "interested"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid status type: " + status });
+      }
 
-        //same user sending request
-        if(fromUserId == toUserId){
-            throw new Error("invalid request you sending request to yourself")
-        }
+      const toUser = await User.findById(toUserId);
+      if (!toUser) {
+        return res.status(404).json({ message: "User not found!" });
+      }
 
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
+        ],
+      });
+      if (existingConnectionRequest) {
+        return res
+          .status(400)
+          .send({ message: "Connection Request Already Exists!!" });
+      }
 
-          //we check if we sending the request to user is exist in my db or not
-          const existUser = await  User.findById(toUserId)
-          if(!existUser){
-            throw new Error("user not found")  
-          }  
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
 
+      const data = await connectionRequest.save();
 
+      // const emailRes = await sendEmail.run(
+      //   "A new friend request from " + req.user.firstName,
+      //   req.user.firstName + " is " + status + " in " + toUser.firstName
+      // );
+      // console.log(emailRes);
 
-          //connection request already exist
-        const alreaadyConnectionExists  = await ConnectionRequest.findOne({
-            $or: [
-                {fromUserId, toUserId},
-                {fromUserId: toUserId, toUserId: fromUserId}
-            ]
-        })
-        if(alreaadyConnectionExists){
-            throw new Error("connection request already exist")
-        }
-
-
-        const connection = new ConnectionRequest({
-            fromUserId,
-            toUserId,
-            status
-        })
-
-        const user  = await connection.save()
-
-        res.json({message: req.user.firstName + " is " + status + " the profile of " + existUser.firstName
-             , user})
+      res.json({
+        message:
+          req.user.firstName + " is " + status + " in " + toUser.firstName,
+        data,
+      });
+    } catch (err) {
+      res.status(400).send("ERROR: " + err.message);
     }
-    catch (err) {
-        console.error(err)
-        res.status(404).send("Something went wrong:  "+ err.message)
-    }
-    })
+  }
+);
+
 
     requestRouter.post("/request/review/:status/:requestId", userAuth , async(req,res)=>{
 

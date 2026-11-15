@@ -4,12 +4,16 @@ const connectDb = require('./config/database')
 const app = express()
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
+const cors = require("cors") 
+
+
+require("dotenv").config()
 
 const authRouter = require("./routes/auth")
 const profileRouter = require("./routes/profile.js")
 const requestRouter = require("./routes/request.js")
 const userRouter = require('./routes/user.js')
-const cors = require("cors") 
+
 
 
 
@@ -42,7 +46,7 @@ connectDb()
     .then(() => {
         console.log('DB connected successfully')
 
-        app.listen(7777, () => {
+        app.listen(process.env.PORT, () => {
             console.log('Server is successfully running on 7777...')
         })
     })

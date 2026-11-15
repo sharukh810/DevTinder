@@ -12,7 +12,7 @@ const userAuth  = async(req,res,next)=>{
             }
             
             // VERIFY JWT TOKEN
-            const decodedMessage = await jwt.verify( token, "Sharukh@786")
+            const decodedMessage = await jwt.verify( token, process.env.JWT_SECRET)
             
             const {_id} = decodedMessage
             
