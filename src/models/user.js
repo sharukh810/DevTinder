@@ -46,20 +46,34 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
     photoUrl: {
-        type: String ,
+      type: String,
+      default: "https://geographyandyou.com/images/user-profile.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
     },
     about: {
-        type: String,
-        default: "this is my about sectiom"
+      type: String,
+      default: "This is a default about of the user!",
     },
     skills: {
-        type: [String]
-    }
-},
-{
-    timestamps: true
-})
+      type: [String],
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 userSchema.methods.getJWT = async function(){
     const user = this

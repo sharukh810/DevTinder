@@ -9,14 +9,6 @@ const cors = require("cors")
 
 require("dotenv").config()
 
-const authRouter = require("./routes/auth")
-const profileRouter = require("./routes/profile.js")
-const requestRouter = require("./routes/request.js")
-const userRouter = require('./routes/user.js')
-
-
-
-
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
@@ -24,10 +16,22 @@ app.use(cors({
     credentials: true,
 }))
 
+const authRouter = require("./routes/auth")
+const profileRouter = require("./routes/profile.js")
+const requestRouter = require("./routes/request.js")
+const userRouter = require('./routes/user.js')
+const paymentRouter = require('./routes/payment.js')
+
+
+
+
+
+
 app.use("/", authRouter)
 app.use("/", profileRouter)
 app.use("/", requestRouter)
 app.use("/", userRouter)
+app.use("/", paymentRouter)
 
 // SIGNUP API
 
