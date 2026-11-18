@@ -5,6 +5,7 @@ const app = express()
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
 const cors = require("cors") 
+const http = require("http")
 
 
 require("dotenv").config()
@@ -21,6 +22,8 @@ const profileRouter = require("./routes/profile.js")
 const requestRouter = require("./routes/request.js")
 const userRouter = require('./routes/user.js')
 const paymentRouter = require('./routes/payment.js')
+const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
 
 
 
@@ -32,14 +35,10 @@ app.use("/", profileRouter)
 app.use("/", requestRouter)
 app.use("/", userRouter)
 app.use("/", paymentRouter)
+app.use("/", chatRouter);
 
-// SIGNUP API
-
-
-//LOGIN API
-
-
-
+const server = http.createServer(app);
+initializeSocket(server);
 
 
 
@@ -50,7 +49,7 @@ connectDb()
     .then(() => {
         console.log('DB connected successfully')
 
-        app.listen(process.env.PORT, () => {
+        server.listen(process.env.PORT, () => {
             console.log('Server is successfully running on 7777...')
         })
     })
